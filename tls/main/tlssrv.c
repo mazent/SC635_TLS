@@ -43,7 +43,7 @@ struct TLS_SRV {
 #endif
 } ;
 
-static const char * TAG = "tcpsrv";
+static const char * TAG = "tlssrv";
 
 
 #define CMD_ESCI		((uint32_t)	0xFF7B7E76)
@@ -116,7 +116,7 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 	        break ;
 	    }
 
-	    int ret = mbedtls_x509_crt_parse(
+	    ret = mbedtls_x509_crt_parse(
 	    				&pSrv->srvcert,
 	    				pSrv->cfg.srv_cert,
 	                    pSrv->cfg.dim_srv_cert) ;
@@ -222,7 +222,7 @@ static bool setup_tls(TLS_SRV * pSrv)
 #endif
 		mbedtls_ssl_conf_ca_chain(&pSrv->conf, pSrv->srvcert.next, NULL) ;
 
-		ret = mbedtls_ssl_conf_own_cert(&pSrv->conf, &pSrv->srv_cert, &pSrv->pkey) ;
+		ret = mbedtls_ssl_conf_own_cert(&pSrv->conf, &pSrv->srvcert, &pSrv->pkey) ;
 		if (ret != 0) {
 			ESP_LOGE(TAG, "mbedtls_ssl_conf_own_cert returned %d", ret) ;
 		    break ;
@@ -404,7 +404,7 @@ static void tlsThd(void * v)
 					        if ( ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE ) {
 					        	ESP_LOGE(TAG, "mbedtls_ssl_handshake returned %d\n\n", ret) ;
 
-					        	reset() ;
+					        	reset(pSrv) ;
 					        	hsOk = false ;
 					        	break ;
 					        }
@@ -472,7 +472,7 @@ static void tlsThd(void * v)
 						            close(i) ;
 						            FD_CLR(i, &active_fd_set) ;
 						            pSrv->cfg.scon() ;
-						            reset() ;
+						            reset(pSrv) ;
 						            break;
 						        }
 
@@ -543,7 +543,6 @@ TLS_SRV * TLS_SRV_beg(TLS_SRV_CFG * pCfg)
 			break ;
 
 		srv->cfg = *pCfg ;
-		srv->cln = -1 ;
 
 		osThreadDef(tlsThd, osPriorityNormal, 1, STACK) ;
 		srv->tid = osThreadCreate(osThread(tlsThd), srv) ;
@@ -600,7 +599,7 @@ bool TLS_SRV_tx(TLS_SRV * pS, const void * v, uint16_t len)
 				continue ;
 
 			if (ret < 0) {
-	            reset() ;
+	            reset(pS) ;
 
 	            (void) invia(pS, CMD_CH_CLN) ;
 	            break ;

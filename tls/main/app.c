@@ -1,5 +1,11 @@
 #include "bsp.h"
+#include "ap.h"
+#include "tlssrv.h"
+
 #include "nvs_flash.h"
+#include "esp_event_loop.h"
+#include "esp_event.h"
+
 
 #include "versione.h"
 
@@ -271,20 +277,20 @@ static void eco_scon(void)
 	ESP_LOGI(TAG, "eco disconnesso") ;
 }
 
-static TCPSRV_CFG ecoCfg = {
+static TLS_SRV_CFG ecoCfg = {
 	.porta = 7,
 
 	.conn = eco_conn,
 	.msg = eco_msg,
 	.scon = eco_scon,
 
-	.cert_chain = CERT_CHAIN,
+	.cert_chain = (const unsigned char *) CERT_CHAIN,
 	.dim_cert_chain = sizeof(CERT_CHAIN),
-	.srv_cert = SRV_CERT,
+	.srv_cert = (const unsigned char *) SRV_CERT,
 	.dim_srv_cert = sizeof(SRV_CERT),
-	.srv_key = SRV_KEY,
+	.srv_key = (const unsigned char *) SRV_KEY,
 	.dim_srv_key = sizeof(SRV_KEY),
-	.pw_srv_key = SRV_PW,
+	.pw_srv_key = (const unsigned char *) SRV_PW,
 	.dim_pw_srv_key = sizeof(SRV_PW)
 } ;
 
