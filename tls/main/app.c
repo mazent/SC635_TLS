@@ -114,41 +114,35 @@ static const char SRV_CERT[] = {
 } ;
 
 static const char SRV_KEY[] = {
-	"-----BEGIN ENCRYPTED PRIVATE KEY-----\r\n"
-	"MIIFHDBOBgkqhkiG9w0BBQ0wQTApBgkqhkiG9w0BBQwwHAQIrVJukqmusFoCAggA\r\n"
-	"MAwGCCqGSIb3DQIJBQAwFAYIKoZIhvcNAwcECMzTDkkndea2BIIEyB9M5Suc66Nw\r\n"
-	"OF2qcQXYQ6yA0FQR13e0ut3uVMvoIHAtCBjEPnoBjPKtSbCjTl67i+EK8MBWyUdG\r\n"
-	"MteROzprq8x3zHQvnYif8celk5BrEexGj2rNQ8Fdcyd1+mFbz5eBFTMydRdT9H6w\r\n"
-	"Fz25P8xkosVo1ILn9fETo50qKo5xsg/yuj7525/d5Mi2adb0j2wHxw5RT1bydjof\r\n"
-	"KIMf3nw3bzmIs+LdgorJilDhbuiOO4rqRHQ6yOR1be6uguKBagy5RYSbDa1cIr/S\r\n"
-	"LYIT29VZm44gd3ivClZXGDLggChZ5veTPhsjwuPb3F6NBbOEMeS4pk7++40gFd2S\r\n"
-	"QFHF5hJmybE9CoKvhurHGSXpLOQww2phKh9ffb7IuK5R4xDEC7dklKDYHvKi0z3b\r\n"
-	"4nYmJpXGYIqKNbm94VzFWDvpFqw3b5Z8AEHlKSdq/YdEd4ahSwqL/KLNiGOn7Kdy\r\n"
-	"41+/Dm1m9wKa22qcfFiq10Oote5zb24IU8WIEEtFi4XKKQg3hS4J0c+rKn1qBqL1\r\n"
-	"xSt5XkO31AgyfdJ3fK5xYByquu6ydSyU+hlEzApzDTPClhctGQcysLrX6S/kPDcj\r\n"
-	"KE1xQINZilX9pvb9QxzUGxVPyUKOM0zkihSziOlg2ZQ75PcTvZbhJLJVl1y7fZf+\r\n"
-	"DPujiIz/deypIo79R7hwkD2m5CAccDIG/Py0Bx763+Zwu0UwEXwdP/RtN/QTIfXa\r\n"
-	"qjkhUhbK8Qmm8dqAmVz+kBSIb+LqytU9VlpaEmLag4AX88z/lyHFuWeHoS+YgrcN\r\n"
-	"u20zEH0wyXW90G9/gbtJETbs1u59CP6Qwsze2nxLZOa8RE+x2hICAwwKaauGiHBT\r\n"
-	"ilXYs+WY7wp3G0tla9bXX6XaQ/Fk/9KdLgll+cOlHYrM09h7cjJYV4pO+Df4AnC+\r\n"
-	"7blYQ/6LrE4fuJOMNVcUPYWZVO+1yoDxOrYqVzfoIR7+wE0lZdUu5LTSJ7eS04PB\r\n"
-	"X4LmIJ7ycobQ1eWr/DXT19+bpKMGk5GXwQaRubt6eCdvuMMs+D4zlvBqm21hVlvh\r\n"
-	"SfcG7Aaik8dM6sqYlcEgtHsOFv3vQgkmIFl5idaZTIeDxfm+jm+3W9ViHZCoIr8m\r\n"
-	"bkATR2cYuUQlg9XzfqhcugOQZnuxjG5PObYY9DK+yF0RJH4umUWB/u7A6p2ZXU/4\r\n"
-	"Fg7LKwyczvB9wS53cAux+jLzz77CcyxqLMk1uteWFY7dpeb1jpHaTyqBtmCPCf3r\r\n"
-	"XitdH+69Pl8Jn9XE9MgDaEzHk3fQXkkjq9fLLT+nQ/anPLbn1eVqPuLxEeP2eGYu\r\n"
-	"mWcOT7A3QAiJSvXsQZBxoefE5MTmWqZGh0j/gXS+swGTwOBt+1aX+7kkDlYIkEVa\r\n"
-	"aaukU9fJJFTeKMy+f/6Xn+ALSzvSnpNgsS4rp26pgO+0a8WN8gTje6FSqesS5x7b\r\n"
-	"UlFGQYph5XSco5/5eKEUi2jauxoD79qEJI3AtuG7EAwxGLT7rTU6h7zgvczouq7o\r\n"
-	"y0W8xKOXG4iX+PX7wPQSFx16scW9Dw/oBbm9fv/JRZlDFliBPq39AX5lpRjN03sK\r\n"
-	"3MXTpmBS/3xEgvQwL5e6sAQm2WA+q5f4Opx8twL1RtTCAlRMc9hxE6jC1iyPwMug\r\n"
-	"VqPsv7PX7d6/2h8jSIztjA==\r\n"
-	"-----END ENCRYPTED PRIVATE KEY-----\r\n"
+	"-----BEGIN RSA PRIVATE KEY-----\r\n"
+	"MIIEowIBAAKCAQEA28v1nIja0RxEXcf+RpIjd58afvYfy3U0TuTs0CUtE7azr7w8\r\n"
+	"n3RT4tmmAxvpA8Bz+Dp3SD+ExBMfaTlyR4TDcutx0rJUMR6dGoDzxitxAT26mphA\r\n"
+	"LmMoxTRjEiagn6ohjqtJUW3Er/FRyOkh+PE+lHryEozwXgsXKyRxG2s3G/5dgb5l\r\n"
+	"JFKHL1xFZzsDAS0knqSZ76PlyrUeHzAQsYaM+lcFGhqarxKFHnR2B81g95wpFGGG\r\n"
+	"Vw57i9xcBa+HfsFDmhWdNlpwDbxld3VvRIo2ad4Lsqlu1ZLuLbXFiuHM+aAffglh\r\n"
+	"rZDiFQ5Vecntv9POxuX/8yV+OxpxX4xUkoSSpQIDAQABAoIBAAvfVIEEE23ALSEz\r\n"
+	"sFR3iFrpyTCactU2m4C3dOM5Xtn1wHb5n/ys9+sE/qakV03Qk3MRFWhdpfpBXiz8\r\n"
+	"4WNjlHscpKVQ5KNSmAHafVBzAEOk5fN7zduzl3wvfDp6w6pcMjvWnLs9RqaKTnSf\r\n"
+	"wyoDPfIfQfwmiMVLrBC0gzeL7wof9Zr4raUSg4dHUjpoit6hMfomCcYMl6X/km75\r\n"
+	"bUtmdOhm9x4mMLWZq7rFIfb1V8+75sL+yGqcZ1y3jNeviU+KNfwct3+zA9gQWN+E\r\n"
+	"Icr6Je2/byMOHlmRM2DTfXJbSvZakNzyM/4hPIK9reDhrmPNFWQTIMyxmONIrLuC\r\n"
+	"lgS/roECgYEA+obj1m99BLIjFN8EHLtOXOtAeR45orOlfBkOPiDvtwW/612ja8HZ\r\n"
+	"Pw6+uf9TQFJBoDmhR6uv3pB5HtbegXBpqKo4EKcSJahipDkjGnENDdQklotmVbhq\r\n"
+	"mJ0EmP6wxrs3PRnWrcuqRSTG6+WZpg7sEQmIQM84959zObW2wwsf3tkCgYEA4Jk0\r\n"
+	"w4PvyhjuczozoAqQ7Hwj6rgT8Cw72/twe7mu0pEXkbNnWzMNyaUypOKiIpfHaD9N\r\n"
+	"vPpHnljmKdt7Ciwr0NyUGo8ZwHucN9opvVC+wZ0llDbKqXrpfsiaKF1G6cbVIFRb\r\n"
+	"Icd9ISJz6h3pLGSTxJkro/ZV/kzcJt9lzSpqiq0CgYAcc8NecCz/ooePcECUTsV4\r\n"
+	"khMxbjhXfRWXQXU3ox/2ZkXEok7UByD4I2GP2CqJTI49dy4U6K/BlCDdWsPMaYrm\r\n"
+	"Z+aUJZVPB4+kXQTalOpJnsVE/7HwnFAm4vZJtes3tr1wSAX0mQPOdH3O/rVzgZBX\r\n"
+	"4wBBdAdhQA+jBzspbZMCCQKBgQCXuOdb7JTgAVeTn42gX4LnPjVFKnTNmhQV1xV1\r\n"
+	"f0oKFNnHI1p+0U5PGbnMiQzeMYoTcjAhqTEYVxWk0Q+dH5m5zkh+aI0M6nPthwML\r\n"
+	"ULCMOoxYQ2tEcjOp4fnBqsFsy1TOMi4d85Uj/RIw5WPPCWKJPK+uY4pT77gIyoEK\r\n"
+	"x8yRQQKBgCi4QvprqOghsENAKzUMGRv5UMIdDa4hAjxz3VJ9Ag0TRPa3FMpVrDBJ\r\n"
+	"0RtBzMb6A2luBP8fP67YGdPo4mVwYjL12OS4srM3ocEYL5KfgOFREX4Tku6slIc1\r\n"
+	"gJgBqdDYBGTbvXwkF6FfUddGvjMJB03515gBCYBbAxFxgbvbsSwb\r\n"
+	"-----END RSA PRIVATE KEY-----\r\n"
 } ;
 
-static const char SRV_PW[] = {
-	"Uj46q3XCrJ7RJsnYQZjQLnpf"
-} ;
 
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
@@ -290,8 +284,8 @@ static TLS_SRV_CFG ecoCfg = {
 	.dim_srv_cert = sizeof(SRV_CERT),
 	.srv_key = (const unsigned char *) SRV_KEY,
 	.dim_srv_key = sizeof(SRV_KEY),
-	.pw_srv_key = (const unsigned char *) SRV_PW,
-	.dim_pw_srv_key = sizeof(SRV_PW)
+	.pw_srv_key = NULL,
+	.dim_pw_srv_key = 0
 } ;
 
 static TLS_SRV * ecoSrv = NULL ;
