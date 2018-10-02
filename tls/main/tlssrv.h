@@ -39,13 +39,16 @@ typedef struct {
 		// sconnessione
 	void (*scon)(void) ;
 
-	// Catena dei certificati
-	const unsigned char * cert_chain ;
-	size_t dim_cert_chain ;
+	// Nome del server (CN)
+	const char * srv_cn ;
 
 	// Certificato del server
 	const unsigned char * srv_cert ;
 	size_t dim_srv_cert ;
+
+	// Catena dei certificati
+	const unsigned char * cert_chain ;
+	size_t dim_cert_chain ;
 
 	// Chiave privata del server
 	const unsigned char * srv_key ;

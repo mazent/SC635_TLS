@@ -32,11 +32,18 @@ struct TLS_SRV {
 	int srvI ;
 
 	mbedtls_net_context listen_fd, client_fd;
+
 	mbedtls_entropy_context entropy;
 	mbedtls_ctr_drbg_context ctr_drbg;
 	mbedtls_ssl_context ssl;
 	mbedtls_ssl_config conf;
+#if 1
 	mbedtls_x509_crt srvcert;
+#else
+    // https://github.com/micropython/micropython-esp32/blob/esp32/extmod/modussl_mbedtls.c
+	mbedtls_x509_crt cacert;
+    mbedtls_x509_crt cert;
+#endif
 	mbedtls_pk_context pkey;
 #if defined(MBEDTLS_SSL_CACHE_C)
 	mbedtls_ssl_cache_context cache;
@@ -107,6 +114,17 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 	     * Instead, you may want to use mbedtls_x509_crt_parse_file() to read the
 	     * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
 	     */
+	    ret = mbedtls_x509_crt_parse(
+	    				&pSrv->srvcert,
+	    				pSrv->cfg.srv_cert,
+	                    pSrv->cfg.dim_srv_cert + 1) ;
+	    if (ret != 0) {
+	        ESP_LOGE(TAG, "srv: mbedtls_x509_crt_parse returned %d", ret) ;
+	        break ;
+	    }
+
+	    //ret = mbedtls_ssl_conf_own_cert(&o->conf, &o->cert, &o->pkey);
+
 	    int ret = mbedtls_x509_crt_parse(
 	    				&pSrv->srvcert,
 	    				pSrv->cfg.cert_chain,
@@ -116,18 +134,9 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 	        break ;
 	    }
 
-	    ret = mbedtls_x509_crt_parse(
-	    				&pSrv->srvcert,
-	    				pSrv->cfg.srv_cert,
-	                    pSrv->cfg.dim_srv_cert) ;
-	    if (ret != 0) {
-	        ESP_LOGE(TAG, "srv: mbedtls_x509_crt_parse returned %d", ret) ;
-	        break ;
-	    }
-
 	    ret = mbedtls_pk_parse_key(
 	    				&pSrv->pkey,
-	    				pSrv->cfg.srv_key, pSrv->cfg.dim_srv_key,
+	    				pSrv->cfg.srv_key, pSrv->cfg.dim_srv_key + 1,
 	    				pSrv->cfg.pw_srv_key, pSrv->cfg.dim_pw_srv_key) ;
 	    if (ret != 0) {
 	        ESP_LOGE(TAG, "mbedtls_pk_parse_key returned %d", ret) ;
@@ -187,12 +196,14 @@ static bool setup_rng(TLS_SRV * pSrv)
 	return 0 == ret ;
 }
 
+#ifdef MBEDTLS_DEBUG_C
 static void my_debug( void *ctx, int level,
                       const char *file, int line,
                       const char *str )
 {
     ESP_LOGI(TAG, "dbg %s:%04d: %s", file, line, str );
 }
+#endif
 
 static bool setup_tls(TLS_SRV * pSrv)
 {
@@ -206,15 +217,17 @@ static bool setup_tls(TLS_SRV * pSrv)
 						MBEDTLS_SSL_IS_SERVER,
 						MBEDTLS_SSL_TRANSPORT_STREAM,
 						MBEDTLS_SSL_PRESET_DEFAULT) ;
-
 		if (ret != 0) {
 			ESP_LOGE(TAG, "mbedtls_ssl_config_defaults returned %d", ret) ;
 		    break ;
 		}
 
-		mbedtls_ssl_conf_rng(&pSrv->conf, mbedtls_ctr_drbg_random, &pSrv->ctr_drbg) ;
-		mbedtls_ssl_conf_dbg(&pSrv->conf, my_debug, NULL) ;
+		mbedtls_ssl_conf_authmode(&pSrv->conf, MBEDTLS_SSL_VERIFY_REQUIRED) ;
 
+		mbedtls_ssl_conf_rng(&pSrv->conf, mbedtls_ctr_drbg_random, &pSrv->ctr_drbg) ;
+#ifdef MBEDTLS_DEBUG_C
+		mbedtls_ssl_conf_dbg(&pSrv->conf, my_debug, NULL) ;
+#endif
 #if defined(MBEDTLS_SSL_CACHE_C)
 		mbedtls_ssl_conf_session_cache(&pSrv->conf, &pSrv->cache,
 		                               mbedtls_ssl_cache_get,
@@ -231,6 +244,12 @@ static bool setup_tls(TLS_SRV * pSrv)
 		ret = mbedtls_ssl_setup(&pSrv->ssl, &pSrv->conf) ;
 		if (ret != 0) {
 			ESP_LOGE(TAG, "mbedtls_ssl_setup returned %d", ret) ;
+		    break ;
+		}
+
+		ret = mbedtls_ssl_set_hostname(&pSrv->ssl, pSrv->cfg.srv_cn) ;
+		if (ret != 0) {
+			ESP_LOGE(TAG, "mbedtls_ssl_set_hostname = %d", ret) ;
 		    break ;
 		}
 
@@ -263,7 +282,11 @@ static void tlsThd(void * v)
 	mbedtls_x509_crt_init( &pSrv->srvcert );
 	mbedtls_pk_init( &pSrv->pkey );
 	mbedtls_entropy_init( &pSrv->entropy );
-	mbedtls_ctr_drbg_init( &pSrv->ctr_drbg );
+    mbedtls_ctr_drbg_init( &pSrv->ctr_drbg );
+#ifdef MBEDTLS_DEBUG_C
+    // Debug level (0-4)
+    mbedtls_esp_enable_debug_log(pSrv->conf, 4);
+#endif
 
 	do {
 	    /*
@@ -402,7 +425,7 @@ static void tlsThd(void * v)
 					    bool hsOk = true ;
 					    while ( ( ret = mbedtls_ssl_handshake( &pSrv->ssl ) ) != 0 ) {
 					        if ( ret != MBEDTLS_ERR_SSL_WANT_READ && ret != MBEDTLS_ERR_SSL_WANT_WRITE ) {
-					        	ESP_LOGE(TAG, "mbedtls_ssl_handshake returned %d\n\n", ret) ;
+					        	ESP_LOGE(TAG, "mbedtls_ssl_handshake returned -%d(0x%04X)\n\n", -ret, -ret) ;
 
 					        	reset(pSrv) ;
 					        	hsOk = false ;
@@ -465,7 +488,7 @@ static void tlsThd(void * v)
 										break;
 
 									default:
-										ESP_LOGE(TAG, "mbedtls_ssl_read returned %d", ret) ;
+										ESP_LOGE(TAG, "mbedtls_ssl_read returned -%d(0x%04X)\n", -ret, -ret) ;
 										break;
 						            }
 
