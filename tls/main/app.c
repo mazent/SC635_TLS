@@ -19,6 +19,8 @@ const char * DATA = __DATE__ ;
 
 static const char * TAG = "tls";
 
+static const char CLN_CN[] = "utente SC635" ;
+
 static const char CERT_CHAIN[] = {
 	// intermediate CA
 	"-----BEGIN CERTIFICATE-----\r\n"
@@ -278,10 +280,14 @@ static TLS_SRV_CFG ecoCfg = {
 	.msg = eco_msg,
 	.scon = eco_scon,
 
-	.cert_chain = (const unsigned char *) CERT_CHAIN,
-	.dim_cert_chain = sizeof(CERT_CHAIN),
+	.srv_cn = CLN_CN,
+
 	.srv_cert = (const unsigned char *) SRV_CERT,
 	.dim_srv_cert = sizeof(SRV_CERT),
+
+	.cert_chain = (const unsigned char *) CERT_CHAIN,
+	.dim_cert_chain = sizeof(CERT_CHAIN),
+
 	.srv_key = (const unsigned char *) SRV_KEY,
 	.dim_srv_key = sizeof(SRV_KEY),
 	.pw_srv_key = NULL,
@@ -342,14 +348,12 @@ void app_main()
     tcpip_adapter_eth_input_t msg;
 	while (true) {
     	if (xQueueReceive(comes, &msg, (portTickType) portMAX_DELAY) == pdTRUE) {
-    		bool x = TLS_SRV_tx(ecoSrv, msg.buffer, msg.len) ;
+    		TLS_SRV_MSG * pM = msg.buffer ;
 
-    		if (x)
-    			ESP_LOGI(TAG, "eco TX[%d]", msg.len) ;
-    		else
-    			ESP_LOGE(TAG, "ERR eco TX[%d]", msg.len) ;
+    		if (!TLS_SRV_tx(ecoSrv, pM->mem, pM->dim))
+    			ESP_LOGE(TAG, "ERR eco TX[%d]", pM->dim) ;
 
-   			free(msg.buffer) ;
+   			osPoolFree(mp, pM) ;
     	}
 	}
 }

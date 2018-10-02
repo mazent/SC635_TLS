@@ -21,7 +21,9 @@
 #include "mbedtls/ssl_cache.h"
 #endif
 
-#define STACK	2000
+#include "mbedtls/esp_debug.h"
+
+#define STACK	5000
 
 struct TLS_SRV {
 	TLS_SRV_CFG cfg ;
@@ -114,10 +116,10 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 	     * Instead, you may want to use mbedtls_x509_crt_parse_file() to read the
 	     * server and CA certificates, as well as mbedtls_pk_parse_keyfile().
 	     */
-	    ret = mbedtls_x509_crt_parse(
+	    int ret = mbedtls_x509_crt_parse(
 	    				&pSrv->srvcert,
 	    				pSrv->cfg.srv_cert,
-	                    pSrv->cfg.dim_srv_cert + 1) ;
+	                    pSrv->cfg.dim_srv_cert) ;
 	    if (ret != 0) {
 	        ESP_LOGE(TAG, "srv: mbedtls_x509_crt_parse returned %d", ret) ;
 	        break ;
@@ -125,7 +127,7 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 
 	    //ret = mbedtls_ssl_conf_own_cert(&o->conf, &o->cert, &o->pkey);
 
-	    int ret = mbedtls_x509_crt_parse(
+	    ret = mbedtls_x509_crt_parse(
 	    				&pSrv->srvcert,
 	    				pSrv->cfg.cert_chain,
 	                    pSrv->cfg.dim_cert_chain) ;
@@ -136,7 +138,7 @@ static bool load_cert_n_key(TLS_SRV * pSrv)
 
 	    ret = mbedtls_pk_parse_key(
 	    				&pSrv->pkey,
-	    				pSrv->cfg.srv_key, pSrv->cfg.dim_srv_key + 1,
+	    				pSrv->cfg.srv_key, pSrv->cfg.dim_srv_key,
 	    				pSrv->cfg.pw_srv_key, pSrv->cfg.dim_pw_srv_key) ;
 	    if (ret != 0) {
 	        ESP_LOGE(TAG, "mbedtls_pk_parse_key returned %d", ret) ;
@@ -201,7 +203,21 @@ static void my_debug( void *ctx, int level,
                       const char *file, int line,
                       const char *str )
 {
-    ESP_LOGI(TAG, "dbg %s:%04d: %s", file, line, str );
+#if 0
+    ESP_LOGI(TAG, "dbg %s:%04d: %s", file, line, str) ;
+#else
+	char x[100] ;
+	size_t i = strlen(str) - 1 ;
+	while ((str[i] == 0x0D) || (str[i] == 0x0A))
+		--i ;
+	if (i >= sizeof(x))
+		i = sizeof(x) - 1 ;
+
+	memcpy(x, str, i+1) ;
+	x[i+1] = 0 ;
+
+    ESP_LOGI(TAG, "dbg %s", x) ;
+#endif
 }
 #endif
 
@@ -284,8 +300,8 @@ static void tlsThd(void * v)
 	mbedtls_entropy_init( &pSrv->entropy );
     mbedtls_ctr_drbg_init( &pSrv->ctr_drbg );
 #ifdef MBEDTLS_DEBUG_C
-    // Debug level (0-4)
-    mbedtls_esp_enable_debug_log(pSrv->conf, 4);
+    // Debug level (0-4 verboso)
+    mbedtls_esp_enable_debug_log(&pSrv->conf, 2);
 #endif
 
 	do {
@@ -403,12 +419,13 @@ static void tlsThd(void * v)
 //
 //							pSrv->cfg.conn(ip) ;
 //						}
-						char ip[30] ;
+
+						struct in_addr ipa ;
 						size_t dimip ;
 						int ret = mbedtls_net_accept(
 										&pSrv->listen_fd,
 										&pSrv->client_fd,
-										ip, 30, &dimip) ;
+										&ipa, sizeof(ipa), &dimip) ;
 					    if (ret != 0) {
 					    	ESP_LOGE(TAG, "OKKIO mbedtls_net_accept returned %d", ret) ;
 
@@ -435,6 +452,7 @@ static void tlsThd(void * v)
 
 					    if (hsOk) {
 					    	FD_SET(pSrv->client_fd.fd, &active_fd_set) ;
+					    	char * ip = inet_ntoa(ipa);
 					    	pSrv->cfg.conn(ip) ;
 					    }
 					}
@@ -487,6 +505,10 @@ static void tlsThd(void * v)
 										ESP_LOGE(TAG, "connection was reset by peer\n") ;
 										break;
 
+									case 0:
+										// Sconnesso
+										break ;
+
 									default:
 										ESP_LOGE(TAG, "mbedtls_ssl_read returned -%d(0x%04X)\n", -ret, -ret) ;
 										break;
@@ -499,7 +521,7 @@ static void tlsThd(void * v)
 						            break;
 						        }
 
-						        ESP_LOGE(TAG, "%d bytes read", ret) ;
+						        //ESP_LOGI(TAG, "%d bytes read", ret) ;
 
 						        msg->dim = ret ;
 
