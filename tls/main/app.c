@@ -280,7 +280,7 @@ static TLS_SRV_CFG ecoCfg = {
 	.msg = eco_msg,
 	.scon = eco_scon,
 
-	.srv_cn = CLN_CN,
+	.cln_cn = CLN_CN,
 
 	.srv_cert = (const unsigned char *) SRV_CERT,
 	.dim_srv_cert = sizeof(SRV_CERT),
@@ -290,8 +290,6 @@ static TLS_SRV_CFG ecoCfg = {
 
 	.srv_key = (const unsigned char *) SRV_KEY,
 	.dim_srv_key = sizeof(SRV_KEY),
-	.pw_srv_key = NULL,
-	.dim_pw_srv_key = 0
 } ;
 
 static TLS_SRV * ecoSrv = NULL ;
